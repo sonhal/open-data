@@ -16,7 +16,7 @@ def make_nav_work_dataset_for_year(year: str, file_path: str) -> str:
     if result.status_code == 404:
         raise FileNotFoundError("ERROR: HTTP 404 | Could not find a endpoint corresponding to the given year")
     else:
-        raise E
+        raise IOError("ERROR: {0} | Could not connect to API endpoint".format(result.status_code))
 
 
 if __name__ == "__main__":
