@@ -2,7 +2,7 @@ import requests
 import os
 
 
-DATA_SET_API_ENDPOINT = "https://hotell.difi.no/download/nav/ledige-stillinger/"
+API_URL_BASE = "https://hotell.difi.no/download/nav/ledige-stillinger/"
 
 
 def make_data_set_for_year(year: str, file_path: str) -> str:
@@ -10,7 +10,7 @@ def make_data_set_for_year(year: str, file_path: str) -> str:
     data_path = os.path.join(os.path.pardir, "data", "raw")
     write_path = os.path.join(data_path, file_path)
 
-    result = requests.api.get(DATA_SET_API_ENDPOINT + str(year))
+    result = requests.api.get(API_URL_BASE + str(year))
     if result.status_code == 200:
         with open(write_path, "wb") as handle:
             for block in result.iter_content(1024):
