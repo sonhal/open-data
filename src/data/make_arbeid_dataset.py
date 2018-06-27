@@ -21,3 +21,4 @@ def make_nav_work_dataset_for_year(year: str, file_path: str) -> str:
 
 if __name__ == "__main__":
     make_nav_work_dataset_for_year(2017, "nav_work_dataset.csv")
+

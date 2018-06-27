@@ -1,7 +1,7 @@
 NAV åpne data
 ==============================
 
-presentasjons prosjekt aom bruk av åpne data fra NAV
+presentasjons prosjekt om bruk av åpne data fra NAV
 
 Project Organization
 ------------
