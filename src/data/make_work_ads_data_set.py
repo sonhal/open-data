@@ -2,12 +2,15 @@ import requests
 import os
 
 
-def make_nav_work_dataset_for_year(year: str, file_path: str) -> str:
-    endpoint = "https://hotell.difi.no/download/nav/ledige-stillinger/{0}".format(year)
+DATA_SET_API_ENDPOINT = "https://hotell.difi.no/download/nav/ledige-stillinger/"
+
+
+def make_data_set_for_year(year: str, file_path: str) -> str:
+
     data_path = os.path.join(os.path.pardir, "data", "raw")
     write_path = os.path.join(data_path, file_path)
 
-    result = requests.api.get(endpoint)
+    result = requests.api.get(DATA_SET_API_ENDPOINT + str(year))
     if result.status_code == 200:
         with open(write_path, "wb") as handle:
             for block in result.iter_content(1024):
@@ -19,6 +22,4 @@ def make_nav_work_dataset_for_year(year: str, file_path: str) -> str:
         raise IOError("ERROR: {0} | Could not connect to API endpoint".format(result.status_code))
 
 
-if __name__ == "__main__":
-    make_nav_work_dataset_for_year(2017, "nav_work_dataset.csv")
 
