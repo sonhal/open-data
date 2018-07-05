@@ -59,5 +59,5 @@ def clean_work_ad_data_pipeline(df: pd.DataFrame) -> pd.DataFrame:
     return (df
             .assign(yrke_grovgruppe=lambda x: x.yrke_grovgruppe.map(clean_yrke_grovgruppe))
             .assign(registrert_dato=lambda x: pd.to_datetime(x.registrert_dato, format='%d.%m.%Y', errors="coerce"))
-            .assign(sistepubl_dato=lambda x: pd.to_datetime(x.sistepubl_dato, format='%d.%m.%Y'))
+            .assign(sistepubl_dato=lambda x: pd.to_datetime(x.sistepubl_dato, format='%d.%m.%Y', errors="coerce"))
             )
