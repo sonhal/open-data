@@ -11,7 +11,10 @@ import numpy as np
 import pandas as pd
 import scipy.stats as sci
 import re
-
+#import matplotlib as mpl 
+from matplotlib import pyplot as plt 
+import seaborn as sns
+#import pandas_profiling as pp
 
 # velger hvor mange kolonner som vises i oppsummeringer:
 pd.set_option('display.max_columns', 23)
@@ -29,14 +32,30 @@ for year in range(2002, 2018):
 
 
 #legg til kolonne med aarstall
-#jobs['aarstall'] = jobs.statistikk_aar_mnd//100
+jobs['aarstall'] = jobs.statistikk_aar_mnd//100
 
 #sjekk at 2005 og 2011 er med
-#sci.itemfreq(jobs.statistikk_aar_mnd//100)
+#jobs['aarstall'].value_counts(sort=False)
 
 
 #Kategorisk
-jobs.iloc[:, 0:2]  = jobs.iloc[:, 0:2].astype('category')
+jobs.iloc[:, 0:2]  = jobs.iloc[:, 0:2].astype(str)
+jobs.nav_enhet_kode = jobs.nav_enhet_kode.astype('category')
+
+
+
+
+#Skrive ut ugyldige nummer:
+#fylkesnr = jobs['arbeidssted_fylkesnummer'].value_counts()
+#fylkesnr = list(np.unique(kilde.index))
+#fylkesnr[:5]
+#fylkesnr[-5:]
+
+ranges = {'arbeidssted_fylkesnummer': range(1, 23), 'arbeidssted_kommunenummer': range(101, 2400), 'yrkeskode': range(1, 10000)}
+
+for column in ranges:
+    a = -jobs[column].isin(ranges[column])  # All values outside the range is True (- negates)
+    jobs.loc[a, column] = np.nan
 
 
 #Datetime
@@ -46,6 +65,7 @@ jobs.iloc[:, 2:4] = jobs.iloc[:, 2:4].apply(pd.to_datetime, errors='coerce', for
 
 
 np.unique(jobs.stillingsnummer).size
+jobs['yrke_grovgruppe'].value_counts()
 jobs['yrke_grovgruppe'].value_counts()
 
 
@@ -225,6 +245,8 @@ def missing_values_table(df):
         
         # Return the dataframe with missing information
         return mis_val_table_ren_columns
+    
+ 
 
 missing_values_table(jobs)
 #sistepubl_dato går fra 31 til 75 missing
@@ -238,8 +260,50 @@ jobs.groupby(['stilling_kilde']).groups.keys()
 
 
 
+sns.set()
+#plotte ulike kategirske var over tid i density plots
+#kilde = jobs.dropna(subset=['stilling_kilde']) # ikke vits, ingen missing
+kilde = jobs['stilling_kilde'].value_counts()
+kilde = list(kilde[kilde.values > 10].index)
+
+# Plot of distribution of scores for building categories
+
+# Plot each building
+for kat in kilde:
+    # Select the building type
+    subset = jobs[jobs['stilling_kilde'] == kat]
+    
+    # Density plot of Energy Star scores
+    sns.kdeplot(subset['statistikk_aar_mnd'],
+               label = kat, shade = False, alpha = 0.8);
+
+
+    
+# label the plot
+plt.xlabel('Energy Star Score', size = 20); plt.ylabel('Density', size = 20); 
+plt.title('Density Plot of Energy Star Scores by Building Type', size = 28);
+plt.show()
+plt.ylim(0, 20)
+
+jobs.groupby(['statistikk_aar_mnd','stilling_kilde'])['antall_stillinger'].sum().unstack('stilling_kilde').plot();
 
 
 
 
 
+
+sns.lmplot(x='statistikk_aar_mnd', y='antall_stillinger', data=jobs)
+
+
+# Remove outliers
+jobs['antall_stillinger_u_outl'] = jobs['antall_stillinger'][jobs['antall_stillinger'] < 200]
+antall_stillinger_u_outl = jobs.loc[jobs['antall_stillinger'] < 15, 'antall_stillinger']
+
+
+sns.lmplot(x='statistikk_aar_mnd', y='antall_stillinger_u_outl', data=jobs)
+
+
+plt.hist(antall_stillinger_u_outl, edgecolor = 'black');
+
+sns.stripplot(x=jobs.statistikk_aar_mnd, y=antall_stillinger_u_outl);
+sns.swarmplot(x=jobs.statistikk_aar_mnd, y=antall_stillinger_u_outl);
